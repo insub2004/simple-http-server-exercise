@@ -78,8 +78,9 @@ public class HttpJob implements Executable {
 
         //TODO#8 client 연결을 종료 합니다.
         try {
+
+            log.debug("client close port:{}", client.getPort());
             client.close();
-            log.debug("client close!");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

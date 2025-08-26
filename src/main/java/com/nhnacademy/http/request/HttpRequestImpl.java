@@ -42,16 +42,18 @@ public class HttpRequestImpl implements HttpRequest {
         try{
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(client.getInputStream()));
 
+            log.debug("client initialize port:{}", client.getPort());
             while (true) {
                 String line = bufferedReader.readLine();
-                // TODO [insub] 자꾸 null 들어옴 -> curl localhost:8080 로 해보세요
-                if (line == null) {                 // 첫 줄도 못 읽고 EOF
+                // TODO [insub] 자꾸 null 들어옴 -> curl localhost:8080 로 해보세요 -> 아. 소켓을 끝으면 EOF 라는 뜻인가? -> wireShark로 봐도 아닌거같은데
+                if (line == null) { // 만약 이게 EOF를 catch 하는 경우라면?? null을 잡으면 안되겠다.
                     log.debug("line=null 입력이 왜 계속 들어오지..?");
+                    log.debug("client null port:{}", client.getPort());
                     break;      // 이게 최선인가?
 //                    line = "GET /index.html HTTP/1.1";
 //                    continue; // 일단 무시
                 }
-                log.debug("line:{}", line);
+//                log.debug("line:{}", line);
 
                 if (isFirstLine(line)) {
                     parseHttpRequestInfo(line);
