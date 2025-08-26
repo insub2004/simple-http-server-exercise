@@ -19,6 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
 
 @Slf4j
 public class MethodNotAllowedService implements HttpService{
@@ -33,15 +34,21 @@ public class MethodNotAllowedService implements HttpService{
     @Override
     public void service(HttpRequest httpRequest, HttpResponse httpResponse) {
         //Body-설정
-        String responseBody = null;
-
+        String responseBody;
+        try {
+            responseBody = ResponseUtils.tryGetBodyFromFile(httpRequest.getRequestURI());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
         //Header-설정
-        String responseHeader = null;
+        String responseHeader = ResponseUtils.createResponseHeader(ResponseUtils.HttpStatus.METHOD_NOT_ALLOWED.getCode(), "utf-8", responseBody.getBytes(StandardCharsets.UTF_8).length);
 
         //PrintWriter 응답
-        try(PrintWriter bufferedWriter = null;){
-
+        try(PrintWriter bufferedWriter = httpResponse.getWriter();){
+            bufferedWriter.write(responseHeader);
+            bufferedWriter.write(responseBody);
+            bufferedWriter.flush();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

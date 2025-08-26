@@ -40,13 +40,16 @@ public class InfoHttpService implements HttpService {
     public void doGet(HttpRequest httpRequest, HttpResponse httpResponse) {
         // body-설정
         String responseBody = null;
+        try {
+            responseBody = ResponseUtils.tryGetBodyFromFile(httpRequest.getRequestURI());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
-
-
-        String id =  null;
-        String name= null;
+        String id = httpRequest.getParameter("id");
+        String name= httpRequest.getParameter("name");
         name = URLDecoder.decode(name, StandardCharsets.UTF_8);
-        String age = null;
+        String age = httpRequest.getParameter("age");
 
         log.debug("id:{}",id);
         log.debug("name:{}",name);
@@ -57,13 +60,20 @@ public class InfoHttpService implements HttpService {
         responseBody = responseBody.replace("${age}",age);
 
         //Header-설정
-        String responseHeader = null;
+        String responseHeader = ResponseUtils.createResponseHeader(200, "utf-8", responseBody.length());
 
         //PrintWriter를 이용한 응답
-        try(PrintWriter bufferedWriter = null;){
-
+        try(PrintWriter bufferedWriter = httpResponse.getWriter();){
+            bufferedWriter.write(responseHeader);
+            bufferedWriter.write(responseBody);
+            bufferedWriter.flush();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public void doPost(HttpRequest httpRequest, HttpResponse httpResponse) {
+        throw new RuntimeException("POST METHOD NOT ALLOW");
     }
 }

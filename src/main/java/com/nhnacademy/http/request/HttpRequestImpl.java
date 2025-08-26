@@ -44,6 +44,12 @@ public class HttpRequestImpl implements HttpRequest {
 
             while (true) {
                 String line = bufferedReader.readLine();
+                // TODO [insub] 자꾸 null 들어옴
+                if (line == null) {                 // 첫 줄도 못 읽고 EOF
+                    log.debug("peer closed before sending request line");
+                    line = "GET /index.html HTTP/1.1";
+//                    continue; // 일단 무시
+                }
                 log.debug("line:{}", line);
 
                 if (isFirstLine(line)) {

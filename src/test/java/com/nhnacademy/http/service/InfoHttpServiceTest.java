@@ -73,8 +73,10 @@ class InfoHttpServiceTest {
 
         //TODO#103- response 검증, httpStatuscode: 200, description: OK 검증 합니다.
         Assertions.assertAll(
-
+                () -> assertTrue(response.contains(String.valueOf(ResponseUtils.HttpStatus.OK.getCode()))),
+                () -> assertTrue(response.contains(ResponseUtils.HttpStatus.OK.getDesription()))
         );
+
     }
 
     @Test
@@ -83,5 +85,6 @@ class InfoHttpServiceTest {
         //TODO#104- response 검증,  request method = POST, RuntimeException이 발생 합니다.
         Mockito.when(httpRequest.getMethod()).thenReturn("POST");
 
+        assertThrows(RuntimeException.class, () -> httpService.service(httpRequest,httpResponse));
     }
 }
