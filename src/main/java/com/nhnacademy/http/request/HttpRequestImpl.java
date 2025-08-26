@@ -44,10 +44,11 @@ public class HttpRequestImpl implements HttpRequest {
 
             while (true) {
                 String line = bufferedReader.readLine();
-                // TODO [insub] 자꾸 null 들어옴
+                // TODO [insub] 자꾸 null 들어옴 -> curl localhost:8080 로 해보세요
                 if (line == null) {                 // 첫 줄도 못 읽고 EOF
-                    log.debug("peer closed before sending request line");
-                    line = "GET /index.html HTTP/1.1";
+                    log.debug("line=null 입력이 왜 계속 들어오지..?");
+                    break;      // 이게 최선인가?
+//                    line = "GET /index.html HTTP/1.1";
 //                    continue; // 일단 무시
                 }
                 log.debug("line:{}", line);
