@@ -44,6 +44,51 @@ public class HttpJob implements Executable {
         //<html><body><h1>thread-1:hello java</h1></body>
         //<html><body><h1>thread-2:hello java</h1></body>
         //....
+        StringBuilder requestBuilder = new StringBuilder();
+        try (
+                BufferedReader br = new BufferedReader(new InputStreamReader(client.getInputStream()));
+                BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(client.getOutputStream()))
+        ) {
+            while (true) {
+                String line = br.readLine();        // 반복해서 요청 헤더들을 쭉 읽고, 빈줄을 읽으면 끝
+                requestBuilder.append(line);
+                log.debug("read line : {}", line);
+                if (Objects.isNull(line) || line.isEmpty()) {
+                    log.debug("line empty? : {}",line);
+                    break;
+                }
+            }
+
+            StringBuilder responseHeader = new StringBuilder();
+            StringBuilder responseBody = new StringBuilder();
+
+            responseBody.append("<html>");
+            responseBody.append("<body>");
+            responseBody.append(String.format("<h1>{%s}hello java</h1>",Thread.currentThread().getName()));
+            responseBody.append("</body>");
+            responseBody.append("</html>");
+
+            responseHeader.append(String.format("HTTP/1.0 200 OK%s", CRLF));
+            responseHeader.append(String.format("Server: HTTP server/0.1%s",CRLF));
+            responseHeader.append(String.format("Content-type: text/html; charset=%s%s","UTF-8",CRLF));
+            responseHeader.append(String.format("Connection: Closed%s",CRLF));
+            responseHeader.append(String.format("Content-Length:%d %s%s",CRLF,CRLF));
+
+            bw.write(responseHeader.toString());
+            bw.write(responseBody.toString());
+            bw.flush();
+            client.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (!client.isClosed()) {
+                try {
+                    client.close();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
 
     }
 }
