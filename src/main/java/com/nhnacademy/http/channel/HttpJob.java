@@ -35,10 +35,13 @@ public class HttpJob implements Executable {
         /*TODO#5 client null check, IllegalArgumentException 발생 합니다. 적절한 ErrorMessage를 작성하세요
             httpRequest, httpResponse, client 초기화 합니다.
          */
+        if (Objects.isNull(client)) {
+            throw new IllegalArgumentException("invalid client");
+        }
 
-        this.httpRequest = null;
-        this.httpResponse = null;
-        this.client = null;
+        this.httpRequest = new HttpRequestImpl(client);
+        this.httpResponse = new HttpResponseImpl(client);
+        this.client = client;
     }
 
     public HttpRequest getHttpRequest() {
@@ -50,7 +53,7 @@ public class HttpJob implements Executable {
 
         log.debug("method:{}", httpRequest.getMethod());
         log.debug("uri:{}", httpRequest.getRequestURI());
-        log.debug("clinet-closed:{}",client.isClosed());
+        log.debug("clinet-closed:{}", client.isClosed());
 
         String responseBody = null;
         String responseHeader = null;
@@ -63,22 +66,45 @@ public class HttpJob implements Executable {
         */
         if(!ResponseUtils.isExist(httpRequest.getRequestURI())){
             //404 - not -found
-            responseBody = null;
-            responseHeader = null;
+            try {
+                responseBody = ResponseUtils.tryGetBodyFromFile(ResponseUtils.DEFAULT_404);
+                responseHeader = ResponseUtils.createResponseHeader(404, "utf-8", responseBody.getBytes("utf-8").length);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }else{
             //파일이 존재 한다면..
             /*TODO#8 responseBody에 응답할 html 파일을 읽습니다.
               - ResponseUtils.tryGetBodyFromFile(httpRequest.getRequestURI()) 이용하여 구현 합니다.
             */
-
-            responseBody = null;
-            responseHeader = null;
+            try {
+                responseBody = ResponseUtils.tryGetBodyFromFile(httpRequest.getRequestURI());
+                responseHeader = ResponseUtils.createResponseHeader(200, "utf-8", responseBody.getBytes("utf-8").length);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
 
         //TODO#12 BufferWriter를 사용 하여 responseHeader, responseBody를 client에게 응답 합니다.
-        BufferedWriter bufferedWriter = null;
+        try {
+            BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(client.getOutputStream(), "utf-8"));
 
-        //TODO#13 client에게 응답 후 cleint와 연결을 종료 합니다.
+            bufferedWriter.write(responseHeader);
+            bufferedWriter.write(responseBody);
+            bufferedWriter.flush();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } finally {
+            //TODO#13 client에게 응답 후 cleint와 연결을 종료 합니다.
+            if (client.isConnected()) {
+                try {
+                    client.close();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+
 
     }
 }

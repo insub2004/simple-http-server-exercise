@@ -12,6 +12,8 @@
 
 package com.nhnacademy.http.response;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -19,13 +21,17 @@ import java.net.Socket;
 import java.nio.charset.Charset;
 import java.util.Objects;
 
-
+@Slf4j
 public class HttpResponseImpl implements HttpResponse {
     //TODO#4 HttpResponse를 구현 합니다.
 
     private final Socket socket;
+    private String charset = "utf-8";
 
     public HttpResponseImpl(Socket socket) {
+        if (Objects.isNull(socket)) {
+            throw new IllegalArgumentException("socker is null!");
+        }
         this.socket = socket;
     }
 
@@ -36,16 +42,24 @@ public class HttpResponseImpl implements HttpResponse {
         // 예를 들어, 파일이나 네트워크 소켓에 데이터를 효율적으로 저장하거나 전송할 때 유용하게 사용할 수 있습니다.
         // https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/io/DataOutputStream.html
 
-        return null;
+        try {
+            DataOutputStream out = new DataOutputStream(socket.getOutputStream());
+            return new PrintWriter(out, false, Charset.forName(charset));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public void setCharacterEncoding(String charset) {
-
+        if (Objects.isNull(charset) || charset.isEmpty()) {
+            throw new IllegalArgumentException("invalid charset");
+        }
+        this.charset = charset;
     }
 
     @Override
     public String getCharacterEncoding() {
-        return null;
+        return charset;
     }
 }

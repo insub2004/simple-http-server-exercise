@@ -82,11 +82,12 @@ public class ResponseUtils {
          * */
 
         StringBuilder responseBody = new StringBuilder();
-        try(InputStream inputStream = ResponseUtils.class.getResourceAsStream(filePath);
-            BufferedReader reader =  new BufferedReader(new InputStreamReader(inputStream,"UTF-8"))){
-            while(true) {
-                String line = reader.readLine();
-                if(Objects.isNull(line)){
+        try (InputStream inputStream = ResponseUtils.class.getResourceAsStream(filePath);
+             BufferedReader br = new BufferedReader(new InputStreamReader(inputStream, "utf-8"))
+        ) {
+            while (true) {
+                String line = br.readLine();
+                if (Objects.isNull(line)/* || line.isEmpty()*/) {   // null은 EOF 즉, 파일의 끝, 그런데 isEmpty는 newLine까지 인식해버려서 아래가 짤려버린다.
                     break;
                 }
                 responseBody.append(line);
