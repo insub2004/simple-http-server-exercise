@@ -12,20 +12,25 @@
 
 package com.nhnacademy.http.util;
 
+import com.nhnacademy.http.context.ApplicationContext;
 import com.nhnacademy.http.context.Context;
 import com.nhnacademy.http.context.ContextHolder;
+
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class CounterUtils {
 
     public final static String CONTEXT_COUNTER_NAME="Global-Counter";
     private CounterUtils(){}
 
-    public static long increaseAndGet(){
+    public synchronized static long increaseAndGet(){
         /* TODO#6 context에 등록된 CONTEXT_COUNTER_NAME 값을 +1 증가시키고 증가된 값을 반환 합니다.
          - context에 증가된 값을 저장 합니다.
          - increaseAndGet() method는 동기화 처리 되어야 합니다.
         */
-
-        return 0l;
+        Context context = ContextHolder.getApplicationContext();
+        long count = (long) context.getAttribute(CONTEXT_COUNTER_NAME);
+        context.setAttribute(CONTEXT_COUNTER_NAME, ++count);
+        return count;
     }
 }
