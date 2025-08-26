@@ -66,10 +66,14 @@ public class SimpleHttpServer {
                 log.debug("------HTTP-REQUEST_start()");
                 while (true) {
                     String line = bufferedReader.readLine();
+                    // TODO [insub] 요청을 한번만 보내도 2번으로 보내지는데? favicon도 아닌게 line이 null인데?
+                    if (Objects.isNull(line)) {
+                        break;
+                    }
                     //TODO#7  requestBuilder에 append 합니다.
                     requestBuilder.append(line);
 
-                    log.debug("{}", line);
+                    log.debug("request : {}", line);
 
                     //TODO#8 종료 조건 null or size==0
                     if (Objects.isNull(line) || line.length() == 0) {
