@@ -16,6 +16,7 @@ import com.nhnacademy.http.context.exception.ObjectNotFoundException;
 import com.nhnacademy.http.service.IndexHttpService;
 import com.nhnacademy.http.service.InfoHttpService;
 import com.nhnacademy.http.util.CounterUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.*;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -121,7 +122,6 @@ class ApplicationContextTest {
             Context context = ContextHolder.getApplicationContext();
             context.setAttribute("counter", 10);
         });
-
         thread1.start();
         thread1.join();
 

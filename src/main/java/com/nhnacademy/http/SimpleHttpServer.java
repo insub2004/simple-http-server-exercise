@@ -57,7 +57,7 @@ public class SimpleHttpServer {
           - ex)  context.setAttribute("/index.html",new IndexHttpService());
           - index.html, info.html, 404.html, 405.html 을 등록 합니다.
         */
-        Context context = new ApplicationContext();
+        Context context = ContextHolder.getApplicationContext();
         context.setAttribute("/index.html", new IndexHttpService());
         context.setAttribute("/info.html", new InfoHttpService());
         context.setAttribute("/404.html", new NotFoundHttpService());

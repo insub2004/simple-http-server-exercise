@@ -14,12 +14,26 @@ package com.nhnacademy;
 
 import com.nhnacademy.http.SimpleHttpServer;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 
 @Slf4j
 public class App 
 {
     public static void main( String[] args ){
         SimpleHttpServer simpleHttpServer = new SimpleHttpServer();
-        simpleHttpServer.start();
+        //simpleHttpServer.start();
+
+        String str1 = null;
+        String str2 = "";
+        String str3 = "Hello";
+
+        System.out.println(isNullOrEmpty(str1)); // true
+        System.out.println(isNullOrEmpty(str2)); // true
+        System.out.println(isNullOrEmpty(str3)); // false
+    }
+
+
+    public static boolean isNullOrEmpty(String str) {
+        return StringUtils.isEmpty(str);
     }
 }

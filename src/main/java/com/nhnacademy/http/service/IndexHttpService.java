@@ -31,10 +31,16 @@ public class IndexHttpService implements HttpService{
         String responseBody = null;
 
         try {
-            responseBody = ResponseUtils.tryGetBodyFromFile(httpRequest.getRequestURI());
-            //TODO#9 CounterUtils.increaseAndGet()를 이용해서 context에 있는 counter 값을 증가시키고, 반환되는 값을 index.html에 반영 합니다.
-            //${count} <-- counter 값을 치환 합니다.
-            responseBody = null;
+            // 1) 템플릿 읽기
+            String template = ResponseUtils.tryGetBodyFromFile(httpRequest.getRequestURI());
+
+            // 2) 카운터 증가 및 값 가져오기
+            //   - CounterUtils가 전역 카운터라면: increaseAndGet()
+            //   - 만약 'context'를 받는 시그니처라면: increaseAndGet(httpRequest.getContext())
+            long count = CounterUtils.increaseAndGet();
+
+            // 3) 템플릿 치환 (replace는 리터럴 치환이라 정규식 이슈가 없습니다)
+            responseBody = template.replace("${count}", String.valueOf(count));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
